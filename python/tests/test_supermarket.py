@@ -1,8 +1,11 @@
 import unittest
 
-from model_objects import Product, SpecialOfferType, ProductUnit
+from approvaltests.approvals import verify
+from model_objects import Product, ProductUnit, SpecialOfferType
+from receipt_printer import ReceiptPrinter
 from shopping_cart import ShoppingCart
 from teller import Teller
+
 from tests.fake_catalog import FakeCatalog
 
 
@@ -15,6 +18,8 @@ class TestSuperMarket(unittest.TestCase):
         self.catalog = FakeCatalog()
         self.catalog.add_product(self.toothbrush, 0.99)
         self.catalog.add_product(self.apples, 1.99)
+
+        self.receipt_printer = ReceiptPrinter()
 
     def test_ten_percent_discount(self):
         teller = Teller(self.catalog)
@@ -36,6 +41,9 @@ class TestSuperMarket(unittest.TestCase):
         self.assertEqual(receipt_item.price, 1.99)
         self.assertEqual(receipt_item.total_price, 2.5 * 1.99)
         self.assertEqual(receipt_item.quantity, 2.5)
+
+        # Test receipt
+        verify(self.receipt_printer.print_receipt(receipt))
 
     def test_ten_percent_discount_multiple_items(self):
         teller = Teller(self.catalog)
@@ -65,6 +73,9 @@ class TestSuperMarket(unittest.TestCase):
         self.assertEqual(receipt_item.total_price, 0.99)
         self.assertEqual(receipt_item.quantity, 1)
 
+        # Test receipt
+        verify(self.receipt_printer.print_receipt(receipt))
+
     def test_no_special_offer(self):
         teller = Teller(self.catalog)
 
@@ -87,6 +98,9 @@ class TestSuperMarket(unittest.TestCase):
         self.assertEqual(receipt_item.product, self.toothbrush)
         self.assertEqual(receipt_item.total_price, 0.99)
         self.assertEqual(receipt_item.quantity, 1)
+
+        # Test receipt
+        verify(self.receipt_printer.print_receipt(receipt))
 
     def test_multiple_discounts(self):
         teller = Teller(self.catalog)
@@ -123,6 +137,8 @@ class TestSuperMarket(unittest.TestCase):
         self.assertEqual(receipt_item.total_price, 0.99)
         self.assertEqual(receipt_item.quantity, 1)
 
+        verify(self.receipt_printer.print_receipt(receipt))
+
     def test_five_for_amount_discount(self):
         teller = Teller(self.catalog)
         teller.add_special_offer(SpecialOfferType.FIVE_FOR_AMOUNT, self.apples, 25)
@@ -143,6 +159,8 @@ class TestSuperMarket(unittest.TestCase):
         self.assertAlmostEqual(50, receipt.total_price())
         self.assertEqual(len(receipt.discounts), 1)
 
+        verify(self.receipt_printer.print_receipt(receipt))
+
     def test_two_for_amount_discount(self):
         teller = Teller(self.catalog)
         teller.add_special_offer(SpecialOfferType.TWO_FOR_AMOUNT, self.apples, 5)
@@ -154,3 +172,5 @@ class TestSuperMarket(unittest.TestCase):
 
         self.assertAlmostEqual(10, receipt.total_price())
         self.assertEqual(len(receipt.discounts), 1)
+
+        verify(self.receipt_printer.print_receipt(receipt))

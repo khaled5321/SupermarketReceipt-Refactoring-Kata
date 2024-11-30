@@ -12,7 +12,7 @@
 On the command line, enter the `SupermarketReceipt-Refactoring-Kata/python` directory and run
 
 ```
-pytest
+pytest --approvaltests-use-reporter='PythonNative'
 ```
 
 ## Calculating test coverage

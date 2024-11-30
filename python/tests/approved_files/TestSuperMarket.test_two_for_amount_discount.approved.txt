@@ -1,0 +1,5 @@
+apples                              7.96
+  1.99 * 4.000
+2 for 5 (apples)                    2.04
+
+Total:                             10.00
