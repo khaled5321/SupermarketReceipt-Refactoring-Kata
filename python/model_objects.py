@@ -25,10 +25,19 @@ class SpecialOfferType(Enum):
     FIVE_FOR_AMOUNT = 4
 
 class Offer:
+    ITEMS_PER_OFFER = {
+        SpecialOfferType.TWO_FOR_AMOUNT: 2,
+        SpecialOfferType.THREE_FOR_TWO: 3,
+        SpecialOfferType.FIVE_FOR_AMOUNT: 5
+    }
+
     def __init__(self, offer_type, product, argument):
         self.offer_type = offer_type
         self.product = product
         self.argument = argument
+
+    def get_items_per_offer(self):
+        return self.ITEMS_PER_OFFER.get(self.offer_type, 1)
 
 
 class Discount:

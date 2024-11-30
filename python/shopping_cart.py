@@ -26,42 +26,37 @@ class ShoppingCart:
         self._product_quantities[product] = self._product_quantities[product] + quantity
 
     def handle_offers(self, receipt, offers, catalog):
-        for product in self._product_quantities.keys():
-            quantity = self._product_quantities[product]
-            if product in offers.keys():
-                offer = offers[product]
-                unit_price = catalog.unit_price(product)
-                quantity_as_int = int(quantity)
-                discount = None
+        for product, quantity in self._product_quantities.items():
+            if product not in offers:
+                continue
 
-                items_per_offer = 1
-                if offer.offer_type == SpecialOfferType.THREE_FOR_TWO:
-                    items_per_offer = 3
+            offer = offers[product]
+            unit_price = catalog.unit_price(product)
+            quantity_as_int = int(quantity)
+            discount = None
 
-                elif offer.offer_type == SpecialOfferType.TWO_FOR_AMOUNT:
-                    items_per_offer = 2
-                    if quantity_as_int >= 2:
-                        total = offer.argument * (quantity_as_int / items_per_offer) + quantity_as_int % 2 * unit_price
-                        discount_amount = unit_price * quantity - total
-                        discount = Discount(product, "2 for " + str(offer.argument), -discount_amount)
+            items_per_offer = offer.get_items_per_offer()
+            offer_sets = math.floor(quantity_as_int / items_per_offer)
+            total_amount = unit_price * quantity
 
-                if offer.offer_type == SpecialOfferType.FIVE_FOR_AMOUNT:
-                    items_per_offer = 5
+            if offer.offer_type == SpecialOfferType.TWO_FOR_AMOUNT and quantity_as_int >= 2:
+                amount_after_discount = (offer.argument * offer_sets) + ((quantity_as_int % 2) * unit_price)
+                discount_amount = total_amount - amount_after_discount
+                discount = Discount(product, f"2 for {offer.argument}", -discount_amount)
 
-                offer_sets = math.floor(quantity_as_int / items_per_offer)
-                if offer.offer_type == SpecialOfferType.THREE_FOR_TWO and quantity_as_int > 2:
-                    discount_amount = quantity * unit_price - (
-                                (offer_sets * 2 * unit_price) + quantity_as_int % 3 * unit_price)
-                    discount = Discount(product, "3 for 2", -discount_amount)
+            if offer.offer_type == SpecialOfferType.THREE_FOR_TWO and quantity_as_int > 2:
+                amount_after_discount = (offer_sets * 2 * unit_price) + ((quantity_as_int % 3) * unit_price)
+                discount_amount = total_amount - amount_after_discount
+                discount = Discount(product, "3 for 2", -discount_amount)
 
-                if offer.offer_type == SpecialOfferType.TEN_PERCENT_DISCOUNT:
-                    discount = Discount(product, str(offer.argument) + "% off",
-                                        -quantity * unit_price * offer.argument / 100.0)
+            if offer.offer_type == SpecialOfferType.TEN_PERCENT_DISCOUNT:
+                discount_amount = total_amount * offer.argument / 100.0
+                discount = Discount(product, f"{offer.argument}% off", -discount_amount)
 
-                if offer.offer_type == SpecialOfferType.FIVE_FOR_AMOUNT and quantity_as_int >= 5:
-                    discount_total = unit_price * quantity - (
-                                offer.argument * offer_sets + quantity_as_int % 5 * unit_price)
-                    discount = Discount(product, str(items_per_offer) + " for " + str(offer.argument), -discount_total)
+            if offer.offer_type == SpecialOfferType.FIVE_FOR_AMOUNT and quantity_as_int >= 5:
+                amount_after_discount = (offer.argument * offer_sets) + ((quantity_as_int % 5) * unit_price)
+                discount_amount = total_amount - amount_after_discount
+                discount = Discount(product, f"{items_per_offer} for {offer.argument}", -discount_amount)
 
-                if discount:
-                    receipt.add_discount(discount)
+            if discount:
+                receipt.add_discount(discount)
