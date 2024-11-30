@@ -15,6 +15,15 @@ On the command line, enter the `SupermarketReceipt-Refactoring-Kata/python` dire
 pytest
 ```
 
+## Calculating test coverage
+
+On the command line, enter the `SupermarketReceipt-Refactoring-Kata/python` directory and run
+
+```
+pytest --cov=. --cov-report=html
+```
+You will find the coverage report in the `htmlcov` directory
+
 ## Optional: Running [TextTest](https://www.texttest.org/) Tests
 
 Install TextTest according to the [instructions](https://www.texttest.org/index.html#getting-started-with-texttest) (platform specific).
