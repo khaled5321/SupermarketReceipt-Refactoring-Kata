@@ -4,7 +4,7 @@ class ReceiptPrinter:
 
     def __init__(self, columns=40):
         self.columns = columns
-  
+
     def print_receipt(self, receipt):
         result = ""
         for item in receipt.items:
@@ -17,7 +17,7 @@ class ReceiptPrinter:
 
         result += "\n"
         result += self.present_total(receipt)
-        return str(result)
+        return result
 
     def print_receipt_item(self, item):
         total_price_printed = self.print_price(item.total_price)
@@ -28,12 +28,8 @@ class ReceiptPrinter:
         return line
 
     def format_line_with_whitespace(self, name, value):
-        line = name
         whitespace_size = self.columns - len(name) - len(value)
-        for i in range(whitespace_size):
-            line += " "
-        line += value
-        line += "\n"
+        line = f"{name}{' ' * whitespace_size}{value}\n"
         return line
 
     def print_price(self, price):
