@@ -1,4 +1,5 @@
 import math
+from collections import defaultdict
 
 from model_objects import ProductQuantity, SpecialOfferType, Discount
 
@@ -7,7 +8,7 @@ class ShoppingCart:
 
     def __init__(self):
         self._items = []
-        self._product_quantities = {}
+        self._product_quantities = defaultdict(float)
 
     @property
     def items(self):
@@ -22,10 +23,7 @@ class ShoppingCart:
 
     def add_item_quantity(self, product, quantity):
         self._items.append(ProductQuantity(product, quantity))
-        if product in self._product_quantities.keys():
-            self._product_quantities[product] = self._product_quantities[product] + quantity
-        else:
-            self._product_quantities[product] = quantity
+        self._product_quantities[product] = self._product_quantities[product] + quantity
 
     def handle_offers(self, receipt, offers, catalog):
         for p in self._product_quantities.keys():
